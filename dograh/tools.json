@@ -1,0 +1,196 @@
+{
+  "base_url_placeholder": "https://YOUR-INVENTORY-APP-DOMAIN",
+  "method": "POST",
+  "auth": "Bearer token = DOGRAH_TOOL_API_KEY",
+  "note": "Create one HTTP API tool per entry in Dograh > Tools. URL = base_url + path. Parameters with the name workflow_run_id are Preset Parameters (value {{initial_context.workflow_run_id}}).",
+  "tools": [
+    {
+      "name": "search_products",
+      "path": "/api/agent/search_products",
+      "description": "Look up clothing designs and their live size-wise stock. Use whenever the user asks about stock, sizes, a design, or before changing anything. If several designs are returned, ask the user which one.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "description": "Design name, colour or SKU as the user said it, e.g. 'blue kurta' or 'KRT-1'",
+          "required": true
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "description": "Optional single size such as S, M, L, XL. Empty for all sizes.",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "daily_sales",
+      "path": "/api/agent/daily_sales",
+      "description": "Today's dispatched units and top designs. Use for 'aaj ki sales'. Takes no parameters.",
+      "parameters": []
+    },
+    {
+      "name": "app_status",
+      "path": "/api/agent/app_status",
+      "description": "Overall live status: designs, sizes, total stock, low/out-of-stock counts, open alerts, pending orders. No parameters.",
+      "parameters": []
+    },
+    {
+      "name": "alerts",
+      "path": "/api/agent/alerts",
+      "description": "Open low-stock, out-of-stock and order-shortage alerts, optionally filtered.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "description": "Optional design/SKU/size filter; empty for all",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "reorder",
+      "path": "/api/agent/reorder",
+      "description": "What needs to be re-ordered for pending marketplace orders, optionally filtered.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "description": "Optional design/SKU filter; empty for all",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "pending_orders",
+      "path": "/api/agent/pending_orders",
+      "description": "Count of pending order lines/units and the latest batch ids. No parameters.",
+      "parameters": []
+    },
+    {
+      "name": "recent_activity",
+      "path": "/api/agent/recent_activity",
+      "description": "Most recent stock changes, optionally for one design.",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "string",
+          "description": "Optional design/SKU filter; empty for latest overall",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "prepare_stock_update",
+      "path": "/api/agent/prepare_stock_update",
+      "description": "STEP 1 of changing stock. Does NOT change anything; returns a summary to read to the user and a confirmation_token. Use operation 'add' to increase by a quantity, 'set' for the final total.",
+      "parameters": [
+        {
+          "name": "sku",
+          "type": "string",
+          "description": "SKU of the exact design (from search_products)",
+          "required": true
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "description": "Size such as S, M, L, XL",
+          "required": true
+        },
+        {
+          "name": "operation",
+          "type": "string",
+          "description": "'add' or 'set'",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "number",
+          "description": "Number of pieces",
+          "required": true
+        },
+        {
+          "name": "workflow_run_id",
+          "type": "number",
+          "description": "Preset parameter, value template {{initial_context.workflow_run_id}}",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "prepare_product_create",
+      "path": "/api/agent/prepare_product_create",
+      "description": "STEP 1 of creating a new design. Does NOT create anything; returns a summary and confirmation_token.",
+      "parameters": [
+        {
+          "name": "sku",
+          "type": "string",
+          "description": "New unique SKU",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Design name",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "description": "Optional category",
+          "required": false
+        },
+        {
+          "name": "sizes",
+          "type": "string",
+          "description": "Sizes separated by spaces or commas, e.g. 'S M L'",
+          "required": true
+        },
+        {
+          "name": "workflow_run_id",
+          "type": "number",
+          "description": "Preset parameter, value template {{initial_context.workflow_run_id}}",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "prepare_dispatch",
+      "path": "/api/agent/prepare_dispatch",
+      "description": "STEP 1 of dispatching a pending order batch. Does NOT dispatch; returns a summary and confirmation_token.",
+      "parameters": [
+        {
+          "name": "order_id",
+          "type": "number",
+          "description": "Order batch id",
+          "required": true
+        },
+        {
+          "name": "workflow_run_id",
+          "type": "number",
+          "description": "Preset parameter, value template {{initial_context.workflow_run_id}}",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "confirm_action",
+      "path": "/api/agent/confirm_action",
+      "description": "STEP 2. Applies a prepared change. Call ONLY after the user clearly said yes to the summary you read out, using the exact confirmation_token from the prepare tool. Never call it in the same turn as a prepare tool.",
+      "parameters": [
+        {
+          "name": "confirmation_token",
+          "type": "string",
+          "description": "Exact token returned by the prepare tool",
+          "required": true
+        },
+        {
+          "name": "workflow_run_id",
+          "type": "number",
+          "description": "Preset parameter, value template {{initial_context.workflow_run_id}}",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
